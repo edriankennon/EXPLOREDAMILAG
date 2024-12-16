@@ -240,12 +240,13 @@ const styles = StyleSheet.create({
   horizontalScrollView: {
     marginBottom: 20,
   },
-  card: {
+  card: { 
     width: width * 0.4,
     marginRight: 10,
     backgroundColor: 'white',
     borderRadius: 10,
     overflow: 'hidden',
+    marginBottom: 'auto'
   },
   cardImage: {
     width: '100%',

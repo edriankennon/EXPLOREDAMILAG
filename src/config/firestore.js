@@ -78,6 +78,25 @@ export const deleteUserData = async (userId) => {
   }
 };
 
+export const getFavorites = async (userId) => {
+  try {
+    const userRef = doc(db, "users", userId);
+    const docSnap = await getDoc(userRef);
+
+    if (docSnap.exists()) {
+      const userData = docSnap.data();
+      return userData.favorites || []; // Return favorites or an empty array
+    } else {
+      console.warn("No user document found for userId:", userId);
+      return [];
+    }
+  } catch (error) {
+    console.error("Error retrieving favorites:", error);
+    throw error;
+  }
+};
+
+
 // Retrieve All Users (Example)
 export const getAllUsers = async () => {
   try {

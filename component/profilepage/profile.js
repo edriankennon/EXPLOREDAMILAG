@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, ScrollView, Modal } from 'react-native';
 import { FontAwesome, Ionicons, MaterialIcons } from '@expo/vector-icons';
+import MapView, { Marker } from 'react-native-maps';
+import * as Location from 'expo-location';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { getStorage, ref, listAll, getDownloadURL, deleteObject } from 'firebase/storage';
@@ -23,6 +25,14 @@ const MyAccountScreen = () => {
   const [attractions, setAttractions] = useState('');
   const [overview, setOverview] = useState('');
   const [exactLocation, setExactLocation] = useState('');
+  const [isMapVisible, setIsMapVisible] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [region, setRegion] = useState({
+    latitude: 8.3601, // Default latitude
+    longitude: 124.8831, // Default longitude
+    latitudeDelta: 0.01,
+    longitudeDelta: 0.01,
+  });
 
   const auth = getAuth();
   const db = getFirestore();
@@ -43,29 +53,23 @@ const MyAccountScreen = () => {
 
       const userDocRef = doc(db, 'users', userId);
 
+
       try {
         const userDoc = await getDoc(userDocRef);
         if (userDoc.exists()) {
           const data = userDoc.data();
           console.log('Fetched Data:', JSON.stringify(data, null, 2));
-          
+
           setProfilePhoto(data.profilePicture || 'https://via.placeholder.com/150');
           setUsername(data.username || 'Name not set');
           setRole(data.role || 'Visitor');
-          
-          // Only set attractions if the role is NOT "Visitor"
-          if (data.role !== 'Visitor') {
-            setAttractions(data.attractions || 'Not Available');
-          } else {
-            setAttractions(''); // Clear attractions for visitors
-          }
-          
+
           if (data.role === 'Business Owner') {
             setBusinessName(data.businessName || 'Business Name not set');
             setBusinessType(data.businessType || 'Business Type not set');
             setLocation(data.location || 'Location not set');
-            setExactLocation(data.exactLocation || 'Exact Location not set'); // Added
-            setOverview(data.overview || 'Overview not set'); // Added
+            setExactLocation(data.exactLocation || '');
+            setOverview(data.overview || 'Overview not set');
             setGuidelines(data.guidelines || 'Guidelines not set');
             setPrices(data.prices || 'Prices not set');
             setContactUs(data.contactUs || 'Contact info not set');
@@ -73,6 +77,17 @@ const MyAccountScreen = () => {
               setBusinessImages(data.businessImages);
             } else {
               await fetchBusinessImagesFromStorage(userId);
+            }
+
+            if (data.exactLocation) {
+              const [latitude, longitude] = data.exactLocation.split(',').map(Number);
+              setSelectedLocation({ latitude, longitude });
+              setRegion({
+                latitude,
+                longitude,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+              });
             }
           }
         } else {
@@ -82,11 +97,33 @@ const MyAccountScreen = () => {
         console.error('Error fetching user data:', error.message);
         alert('Error fetching user data.');
       }
-      
     };
 
     fetchUserData();
   }, []);
+
+  const handleOpenMap = async () => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      alert('Permission to access location was denied');
+      return;
+    }
+
+    const location = await Location.getCurrentPositionAsync({});
+    setRegion({
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+      latitudeDelta: 0.01,
+      longitudeDelta: 0.01,
+    });
+    setIsMapVisible(true);
+  };
+
+  const handleSelectLocation = (coordinate) => {
+    setSelectedLocation(coordinate);
+    setExactLocation(`${coordinate.latitude}, ${coordinate.longitude}`);
+    setIsMapVisible(false);
+  };
 
   const fetchBusinessImagesFromStorage = async (userId) => {
     try {
@@ -135,6 +172,7 @@ const MyAccountScreen = () => {
       email,
       role,
       businessImages,
+      exactLocation
     };
 
     if (role === 'Business Owner') {
@@ -234,6 +272,19 @@ const MyAccountScreen = () => {
         <Text style={styles.profileEmail}>{email}</Text>
       </View>
 
+      <Modal visible={isMapVisible} animationType="slide">
+        <MapView
+          style={styles.map}
+          region={region}
+          onPress={(e) => handleSelectLocation(e.nativeEvent.coordinate)}
+        >
+          {selectedLocation && <Marker coordinate={selectedLocation} />}
+        </MapView>
+        <TouchableOpacity style={styles.closeMapButton} onPress={() => setIsMapVisible(false)}>
+          <Text style={styles.closeMapText}>Close Map</Text>
+        </TouchableOpacity>
+      </Modal>
+
       <View style={styles.fieldsContainer}>
         {renderField('person', 'Name', username, setUsername, isEditing, Ionicons)}
         {renderField('mail', 'Email', email, setEmail, isEditing, MaterialIcons)}
@@ -309,7 +360,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#4CAF50',
-    padding: 25,
+    padding: 30,
     
   },
   headerTitle: {
@@ -337,7 +388,7 @@ const styles = StyleSheet.create({
   profileContainer: {
     alignItems: 'center',
     marginBottom: 20,
-    marginTop:20,
+    marginTop: 20,
   },
   profileImage: {
     width: 150,
@@ -355,11 +406,11 @@ const styles = StyleSheet.create({
     color: 'gray',
   },
   fieldsContainer: {
-    width: '90%',
-    marginTop: 10,
-    marginLeft: 20,
-    
-  },
+  width: '90%',
+  marginTop: 10,
+  alignSelf: 'center', // Centers the container horizontally
+},
+
   fieldRow: {
     flexDirection: 'row',
     alignItems: 'center',

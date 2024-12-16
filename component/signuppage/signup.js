@@ -470,13 +470,13 @@ const styles = StyleSheet.create({
   },
   header: {
     height: '0',
-    backgroundColor: 'green',
+    backgroundColor: '#28a745',
     marginBottom: 20,
   },
   headerText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: 'green',
+    color: '#28a745',
     textAlign: 'center',
     marginTop: 10,
     marginBottom: 20,
@@ -573,9 +573,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   signUpButton: {
-    backgroundColor: 'green',
+    backgroundColor: '#28a745',
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 20,
     alignItems: 'center',
     marginTop: 20,
   },

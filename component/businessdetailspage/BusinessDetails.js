@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore'; // Ensure setDoc is imported
 import app from '../../src/config/firebase';
 
 // Get the screen dimensions
@@ -47,6 +47,46 @@ const BusinessDetails = ({ route, navigation }) => {
     fetchBusinessDetails();
   }, [uid]);
 
+  const cleanData = (data) => {
+    return Object.fromEntries(
+      Object.entries(data).filter(([_, value]) => value !== undefined)
+    );
+  };
+
+  const handleFavoriteToggle = async () => {
+    setIsFavorited(!isFavorited);
+  
+    const userId = 'currentUserId'; // Replace with actual user ID
+    const favoritesRef = doc(db, 'users', userId);
+  
+    try {
+      const docSnap = await getDoc(favoritesRef);
+  
+      let updatedFavorites = [];
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        updatedFavorites = data.favorites || [];
+      }
+  
+      if (isFavorited) {
+        // Remove from favorites
+        updatedFavorites = updatedFavorites.filter((item) => item.uid !== business.uid);
+      } else {
+        // Add to favorites
+        const cleanedBusiness = cleanData(business); // Clean the business object
+        updatedFavorites.push({ uid: business.uid, ...cleanedBusiness });
+      }
+  
+      // Clean the entire updatedFavorites array
+      const cleanedFavorites = updatedFavorites.map((fav) => cleanData(fav));
+  
+      await setDoc(favoritesRef, { favorites: cleanedFavorites }, { merge: true });
+      console.log('Favorites updated successfully!');
+    } catch (error) {
+      console.error('Error updating favorites:', error);
+    }
+  };
+  
   // Handle loading state
   if (loading) {
     return (
@@ -89,10 +129,7 @@ const BusinessDetails = ({ route, navigation }) => {
         <View style={styles.titleRow}>
           <Text style={styles.name}>{business.businessName || 'Unnamed Business'}</Text>
           {/* Heart button */}
-          <TouchableOpacity
-            onPress={() => setIsFavorited(!isFavorited)}
-            style={styles.heartButton}
-          >
+          <TouchableOpacity onPress={handleFavoriteToggle} style={styles.heartButton}>
             <Ionicons
               name={isFavorited ? 'heart' : 'heart-outline'}
               size={24}
@@ -126,26 +163,39 @@ const BusinessDetails = ({ route, navigation }) => {
         </TouchableOpacity>
 
         <View style={styles.actionContainer}>
-          <TouchableOpacity style={styles.actionButton}>
-            <Ionicons name="location-outline" size={scaleSize(30)} color="black" />
-            <Text style={styles.actionText}>Location</Text>
-          </TouchableOpacity>
+  <TouchableOpacity
+    style={styles.actionButton}
+    onPress={() => navigation.navigate('LocationScreen', { business })}
+  >
+    <Ionicons name="location-outline" size={scaleSize(30)} color="black" />
+    <Text style={styles.actionText}>Location</Text>
+  </TouchableOpacity>
 
-          <TouchableOpacity style={styles.actionButton}>
-            <Ionicons name="book-outline" size={scaleSize(30)} color="black" />
-            <Text style={styles.actionText}>Guidelines</Text>
-          </TouchableOpacity>
+  <TouchableOpacity
+    style={styles.actionButton}
+    onPress={() => navigation.navigate('GuidelinesScreen', { business })}
+  >
+    <Ionicons name="book-outline" size={scaleSize(30)} color="black" />
+    <Text style={styles.actionText}>Guidelines</Text>
+  </TouchableOpacity>
 
-          <TouchableOpacity style={styles.actionButton}>
-            <Ionicons name="wallet-outline" size={scaleSize(30)} color="black" />
-            <Text style={styles.actionText}>Prices</Text>
-          </TouchableOpacity>
+  <TouchableOpacity
+    style={styles.actionButton}
+    onPress={() => navigation.navigate('PricesScreen', { business })}
+  >
+    <Ionicons name="wallet-outline" size={scaleSize(30)} color="black" />
+    <Text style={styles.actionText}>Prices</Text>
+  </TouchableOpacity>
 
-          <TouchableOpacity style={styles.actionButton}>
-            <Ionicons name="call-outline" size={scaleSize(30)} color="black" />
-            <Text style={styles.actionText}>Contact Us</Text>
-          </TouchableOpacity>
-        </View>
+  <TouchableOpacity
+    style={styles.actionButton}
+    onPress={() => navigation.navigate('ContactUsScreen', { business })}
+  >
+    <Ionicons name="call-outline" size={scaleSize(30)} color="black" />
+    <Text style={styles.actionText}>Contact Us</Text>
+  </TouchableOpacity>
+</View>
+
 
         <TouchableOpacity style={styles.goThereButton}>
           <Text style={styles.goThereButtonText}>Go there now!</Text>

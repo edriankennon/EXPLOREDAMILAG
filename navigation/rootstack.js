@@ -28,7 +28,10 @@ import Tricab from '../component/Transpopage/triCab';
 import MultiCab from '../component/Transpopage/multiCab';
 import Habal from '../component/Transpopage/habal';
 import BarangayDamilag from '../component/brgydamilagpage/BarangayDamilagInfo';
-
+import LocationScreen from '../component/businessdetailspage/LocationScreen';
+import GuidelinesScreen from '../component/businessdetailspage/GuidelinesScreen'; 
+import PricesScreen from '../component/businessdetailspage/PricesScreen';
+import ContactUsScreen from '../component/businessdetailspage/ContactUsScreen';
 
 
 
@@ -153,55 +156,84 @@ const RootStack = () => {
           options={{
             headerShown: false,
           }}
-      />
+        />
         <Stack.Screen
           name="Prices"
           component={Prices}
           options={{
             headerShown: false,
           }}
-      />
-      <Stack.Screen
+        />
+        <Stack.Screen
           name="Guidelines"
           component={GuidelinesPage}
           options={{
             headerShown: false,
           }}
-      />
-       <Stack.Screen
+        />
+        <Stack.Screen
           name="ContactUs"
           component={ContactUs}
           options={{
             headerShown: false,
           }}
-      />
-        <Stack.Screen
-        name="Tricab"
-        component={Tricab}
-        options={{
-          headerShown: false,
-        }}
         />
         <Stack.Screen
-        name="Multicab"
-        component={MultiCab}
-        options={{
-          headerShown: false,
-        }}
+          name="Tricab"
+          component={Tricab}
+          options={{
+            headerShown: false,
+          }}
         />
         <Stack.Screen
-        name="Habal"
-        component={Habal}
-        options={{
-          headerShown: false,
-        }}
+          name="Multicab"
+          component={MultiCab}
+          options={{
+            headerShown: false,
+          }}
         />
-    
-      
+        <Stack.Screen
+          name="Habal"
+          component={Habal}
+          options={{
+            headerShown: false,
+          }}
+        />
+
+        {/* New Screens */}
+        <Stack.Screen
+          name="LocationScreen"
+          component={LocationScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="GuidelinesScreen"
+          component={GuidelinesScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="PricesScreen"
+          component={PricesScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="ContactUsScreen"
+          component={ContactUsScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
 };
+
 
 
 const NavBar = () => {

@@ -1,31 +1,103 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, TextInput, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, Alert, FlatList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import placesData from '../placesdatapage/placesdata';
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore'; // Added setDoc
+import app from '../../src/config/firebase';
 
 const FavoritesScreen = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [favorites, setFavorites] = useState(Object.values(placesData)); // State to store favorite places
+  const [favorites, setFavorites] = useState([]);
+  const db = getFirestore(app);
+
+  // Fetch favorites from Firestore on component mount
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      const userId = 'currentUserId'; // Replace with actual user ID
+      const favoritesRef = doc(db, 'users', userId);
+
+      try {
+        const docSnap = await getDoc(favoritesRef);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+
+          // Clean the favorites array to avoid undefined values
+          const cleanedFavorites = (data.favorites || []).map((fav, index) => {
+            if (!fav.uid) {
+              console.warn(`Favorite at index ${index} is missing a uid`);
+              fav.uid = `temp-id-${index}`; // Assign a temporary id
+            }
+            return Object.fromEntries(Object.entries(fav).filter(([key, value]) => value !== undefined));
+          });
+          setFavorites(cleanedFavorites);
+        }
+      } catch (error) {
+        console.error('Error fetching favorites:', error);
+      }
+    };
+
+    // Execute the fetchFavorites function
+    fetchFavorites();
+  }, []); // Dependency array ensures it runs only once on component mount
 
   // Filter places based on the search query
   const filteredPlaces = searchQuery
     ? favorites.filter((place) =>
-        place.name.toLowerCase().includes(searchQuery.toLowerCase())
+        place.businessName?.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : favorites;
 
-  // Remove all favorites
+  // Remove all favorites and update Firestore
   const handleRemoveAllFavorites = () => {
     Alert.alert(
-      "Remove All Favorites",
-      "Are you sure you want to remove all your favorite places?",
+      'Remove All Favorites',
+      'Are you sure you want to remove all your favorite places?',
       [
-        { text: "Cancel", style: "cancel" },
-        { text: "Remove", onPress: () => setFavorites([]) }, // Clear the favorites list
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Remove',
+          onPress: async () => {
+            setFavorites([]); // Clear the favorites locally
+
+            // Clear favorites in Firestore
+            const userId = 'currentUserId'; // Replace with actual user ID
+            const favoritesRef = doc(db, 'users', userId);
+            try {
+              await setDoc(favoritesRef, { favorites: [] }, { merge: true });
+              console.log('Favorites removed successfully!');
+            } catch (error) {
+              console.error('Error removing favorites:', error);
+            }
+          },
+        },
       ]
     );
   };
 
+  // Render a single favorite card
+  const renderFavorite = ({ item }) => (
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => navigation.navigate('BusinessDetails', { uid: item.uid })}
+    >
+      <Image
+        source={{ uri: item.businessImages?.[0] || 'https://via.placeholder.com/100x100' }}
+        style={styles.cardImage}
+      />
+      <View style={styles.cardContent}>
+        <View style={styles.cardTitleRow}>
+          <Text style={styles.cardTitle}>{item.businessName || 'Unknown Business'}</Text>
+          <View style={styles.ratingContainer}>
+            {[...Array(item.rating || 0)].map((_, idx) => (
+              <Ionicons key={idx} name="star" size={16} color="gold" />
+            ))}
+          </View>
+        </View>
+        <Text style={styles.cardSubtitle}>{item.location || 'Unknown Location'}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+  
   return (
     <View style={styles.container}>
       {/* Header Section */}
@@ -51,32 +123,14 @@ const FavoritesScreen = ({ navigation }) => {
         )}
       </View>
 
-      {/* Favorites List */}
-      <ScrollView contentContainerStyle={styles.contentContainer}>
-        {filteredPlaces.map((place, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.card}
-            onPress={() => navigation.navigate('BusinessDetails', { place })}
-          >
-            <Image source={place.images[0]} style={styles.cardImage} />
-            <View style={styles.cardContent}>
-              <View style={styles.cardTitleRow}>
-                <Text style={styles.cardTitle}>{place.name}</Text>
-                <View style={styles.ratingContainer}>
-                  {[...Array(place.rating)].map((_, idx) => (
-                    <Ionicons key={idx} name="star" size={16} color="gold" />
-                  ))}
-                </View>
-              </View>
-              <Text style={styles.cardSubtitle}>{place.location}</Text>
-            </View>
-          </TouchableOpacity>
-        ))}
-        {favorites.length === 0 && (
-          <Text style={styles.noFavoritesText}>No favorites to display.</Text>
-        )}
-      </ScrollView>
+       {/* Favorites List */}
+       <FlatList
+        data={filteredPlaces}
+        keyExtractor={(item, index) => item.uid || index.toString()} // Use index as fallback
+        renderItem={renderFavorite}
+        contentContainerStyle={styles.contentContainer}
+        ListEmptyComponent={<Text style={styles.noFavoritesText}>No favorites to display.</Text>}
+      />
     </View>
   );
 };
