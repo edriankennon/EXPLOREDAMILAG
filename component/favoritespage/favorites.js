@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, Alert, FlatList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore'; // Added setDoc
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import app from '../../src/config/firebase';
 
 const FavoritesScreen = ({ navigation }) => {
@@ -17,18 +17,12 @@ const FavoritesScreen = ({ navigation }) => {
 
       try {
         const docSnap = await getDoc(favoritesRef);
-
         if (docSnap.exists()) {
           const data = docSnap.data();
-
-          // Clean the favorites array to avoid undefined values
-          const cleanedFavorites = (data.favorites || []).map((fav, index) => {
-            if (!fav.uid) {
-              console.warn(`Favorite at index ${index} is missing a uid`);
-              fav.uid = `temp-id-${index}`; // Assign a temporary id
-            }
-            return Object.fromEntries(Object.entries(fav).filter(([key, value]) => value !== undefined));
-          });
+          const cleanedFavorites = (data.favorites || []).map((fav, index) => ({
+            ...fav,
+            uid: fav.uid || `temp-id-${index}`, // Ensure UID exists
+          }));
           setFavorites(cleanedFavorites);
         }
       } catch (error) {
@@ -36,9 +30,29 @@ const FavoritesScreen = ({ navigation }) => {
       }
     };
 
-    // Execute the fetchFavorites function
     fetchFavorites();
-  }, []); // Dependency array ensures it runs only once on component mount
+  }, []);
+
+  // Add an item to favorites
+  const handleAddFavorite = async (item) => {
+    const userId = 'currentUserId'; // Replace with actual user ID
+    const favoritesRef = doc(db, 'users', userId);
+
+    if (favorites.some((fav) => fav.uid === item.uid)) {
+      Alert.alert('Already Added', 'This item is already in your favorites.');
+      return;
+    }
+
+    const updatedFavorites = [...favorites, item];
+
+    try {
+      setFavorites(updatedFavorites); // Update local state
+      await setDoc(favoritesRef, { favorites: updatedFavorites }, { merge: true }); // Update Firestore
+      console.log('Favorite added successfully!');
+    } catch (error) {
+      console.error('Error adding favorite:', error);
+    }
+  };
 
   // Filter places based on the search query
   const filteredPlaces = searchQuery
@@ -57,9 +71,7 @@ const FavoritesScreen = ({ navigation }) => {
         {
           text: 'Remove',
           onPress: async () => {
-            setFavorites([]); // Clear the favorites locally
-
-            // Clear favorites in Firestore
+            setFavorites([]); // Clear local favorites
             const userId = 'currentUserId'; // Replace with actual user ID
             const favoritesRef = doc(db, 'users', userId);
             try {
@@ -87,25 +99,25 @@ const FavoritesScreen = ({ navigation }) => {
       <View style={styles.cardContent}>
         <View style={styles.cardTitleRow}>
           <Text style={styles.cardTitle}>{item.businessName || 'Unknown Business'}</Text>
-          <View style={styles.ratingContainer}>
-            {[...Array(item.rating || 0)].map((_, idx) => (
-              <Ionicons key={idx} name="star" size={16} color="gold" />
-            ))}
-          </View>
+          <TouchableOpacity onPress={() => handleAddFavorite(item)}>
+            <Ionicons
+              name={favorites.some((fav) => fav.uid === item.uid) ? 'heart' : 'heart-outline'}
+              size={24}
+              color="#ff4d4d"
+            />
+          </TouchableOpacity>
         </View>
         <Text style={styles.cardSubtitle}>{item.location || 'Unknown Location'}</Text>
       </View>
     </TouchableOpacity>
   );
-  
+
   return (
     <View style={styles.container}>
-      {/* Header Section */}
       <View style={styles.headerContainer}>
         <Text style={styles.headerText}>My Places</Text>
       </View>
 
-      {/* Search Bar with Delete Icon */}
       <View style={styles.searchBarWrapper}>
         <View style={styles.searchBarContainer}>
           <Ionicons name="search" size={20} color="#32a852" style={styles.searchIcon} />
@@ -123,10 +135,9 @@ const FavoritesScreen = ({ navigation }) => {
         )}
       </View>
 
-       {/* Favorites List */}
-       <FlatList
+      <FlatList
         data={filteredPlaces}
-        keyExtractor={(item, index) => item.uid || index.toString()} // Use index as fallback
+        keyExtractor={(item, index) => item.uid || index.toString()}
         renderItem={renderFavorite}
         contentContainerStyle={styles.contentContainer}
         ListEmptyComponent={<Text style={styles.noFavoritesText}>No favorites to display.</Text>}

@@ -32,6 +32,7 @@ import LocationScreen from '../component/businessdetailspage/LocationScreen';
 import GuidelinesScreen from '../component/businessdetailspage/GuidelinesScreen'; 
 import PricesScreen from '../component/businessdetailspage/PricesScreen';
 import ContactUsScreen from '../component/businessdetailspage/ContactUsScreen';
+import ExactLocationScreen from '../component/businessdetailspage/ExactLocationScreen';
 
 
 
@@ -228,6 +229,12 @@ const RootStack = () => {
           options={{
             headerShown: false,
           }}
+        />
+
+        <Stack.Screen
+          name="ExactLocationScreen"
+          component={ExactLocationScreen}
+          options={{ title: 'Exact Location' }}
         />
       </Stack.Navigator>
     </NavigationContainer>

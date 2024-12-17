@@ -197,9 +197,12 @@ const BusinessDetails = ({ route, navigation }) => {
 </View>
 
 
-        <TouchableOpacity style={styles.goThereButton}>
-          <Text style={styles.goThereButtonText}>Go there now!</Text>
-        </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.goThereButton}
+        onPress={() => navigation.navigate('ExactLocationScreen', { business })}
+      >
+        <Text style={styles.goThereButtonText}>Go there now!</Text>
+      </TouchableOpacity>
 
         <View style={styles.photosContainer}>
           <Text style={styles.photosTitle}>Photos</Text>

@@ -8,6 +8,7 @@ import * as Location from 'expo-location';
 import { handleSignUp } from '../../src/config/auth';
 import { saveUserData } from '../../src/config/firestore';
 import { uploadProfilePhoto, uploadBusinessImages } from '../../src/config/storage';
+import { Ionicons } from '@expo/vector-icons'; 
 
 const SignUpScreen = () => {
   const navigation = useNavigation();
@@ -186,7 +187,9 @@ const SignUpScreen = () => {
   };
 
   return (
-    <ScrollView  bounces={true} keyboardShouldPersistTaps="handled" contentContainerStyle={styles.container}>
+    <ScrollView  bounces={true}
+    keyboardShouldPersistTaps="handled"
+    contentContainerStyle={styles.container}>
       <View style={styles.header} />
       <Text style={styles.headerText}>Sign Up</Text>
   
@@ -254,22 +257,23 @@ const SignUpScreen = () => {
       </TouchableOpacity>
   
       {/* Role Picker Modal */}
-      <Modal visible={isRolePickerVisible} transparent animationType="slide">
-        <View style={styles.modalContainer}>
-          <View style={styles.modal}>
-            <Text style={styles.modalHeader}>Select Role</Text>
-            <TouchableOpacity style={styles.modalOption} onPress={() => handleRoleSelect('Visitor')}>
-              <Text style={styles.modalText}>Visitor</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.modalOption} onPress={() => handleRoleSelect('Business Owner')}>
-              <Text style={styles.modalText}>Business Owner</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setRolePickerVisible(false)}>
-              <Text style={styles.modalClose}>Close</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+      <Modal visible={isRolePickerVisible} transparent animationType="fade">
+  <View style={styles.modalContainer}>
+    <View style={styles.modal}>
+      <Text style={styles.modalHeader}>Select Role</Text>
+      <TouchableOpacity style={styles.modalOption} onPress={() => handleRoleSelect('Visitor')}>
+        <Text style={styles.modalText}>Visitor</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.modalOption} onPress={() => handleRoleSelect('Business Owner')}>
+        <Text style={styles.modalText}>Business Owner</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => setRolePickerVisible(false)}>
+        <Text style={styles.modalClose}>Close</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
+
   
       {role === 'Business Owner' && (
         <>
@@ -348,38 +352,42 @@ const SignUpScreen = () => {
           </View>
 
         {/* Open Map Modal */}
-        <TouchableOpacity style={styles.mapButton} onPress={handleOpenMap}>
-          <Text style={styles.mapButtonText}>Select Location on Map</Text>
-        </TouchableOpacity>
 
         <Modal visible={isMapVisible} animationType="slide">
-          <MapView
-            style={styles.map}
-            region={region}
-            onPress={(e) => handleSelectLocation(e.nativeEvent.coordinate)}
-          >
-            {selectedLocation && <Marker coordinate={selectedLocation} />}
-          </MapView>
-          <TouchableOpacity
-            style={styles.closeMapButton}
-            onPress={() => setIsMapVisible(false)}
-          >
-            <Text style={styles.closeMapText}>Close Map</Text>
-          </TouchableOpacity>
-        </Modal>
+  <View style={{ flex: 1 }}>
+    {/* Map */}
+    <MapView
+      style={styles.map}
+      region={region}
+      onPress={(e) => handleSelectLocation(e.nativeEvent.coordinate)}
+    >
+      {selectedLocation && <Marker coordinate={selectedLocation} />}
+    </MapView>
+
+    {/* Close Button */}
+    <TouchableOpacity
+      style={styles.closeMapButton}
+      onPress={() => setIsMapVisible(false)} // Close the modal
+    >
+      <Ionicons name="close" size={30} color="#000" />
+    </TouchableOpacity>
+  </View>
+</Modal>
 
 
-                {/* Exact Location */}
-          <Text style={styles.label}>Exact Location</Text>
-          <View style={styles.inputGroup}>
-            <FontAwesome name="map" size={20} color="green" style={styles.icon} />
-            <TextInput
-              style={styles.input}
-              placeholder="Exact Location"
-              value={exactLocation}
-              onChangeText={setExactLocation}
-            />
-          </View>
+{/* Exact Location */}
+            
+<View style={styles.inputGroup}>
+  <FontAwesome name="map" size={20} color="green" style={styles.icon} />
+  <TouchableOpacity
+    style={styles.inputTouchable}
+    onPress={handleOpenMap} // Opens the map modal
+  >
+    <Text style={styles.inputText}>
+      {exactLocation || 'Select Location on Map'}
+    </Text>
+  </TouchableOpacity>
+</View>
   
           {/* Guidelines */}
           <Text style={styles.label}>Guidelines</Text>
@@ -446,18 +454,20 @@ const SignUpScreen = () => {
   </View>
 )}
   
-      {/* Sign Up Button */}
-      <TouchableOpacity style={styles.signUpButton} onPress={handleSignUpSubmit}>
-        <Text style={styles.signUpButtonText}>Sign Up</Text>
+<View style={styles.footerContainer}>
+    <TouchableOpacity style={styles.signUpButton} onPress={handleSignUpSubmit}>
+      <Text style={styles.signUpButtonText}>Sign Up</Text>
+    </TouchableOpacity>
+    
+    <View style={styles.loginContainer}>
+      <Text style={styles.loginText}>Already have an account?</Text>
+      <TouchableOpacity onPress={() => navigation.navigate('LoginScreen')}>
+        <Text style={styles.loginLink}> Login here</Text>
       </TouchableOpacity>
-  
-      {/* Login Prompt */}
-      <View style={styles.loginContainer}>
-        <Text style={styles.loginText}>Already have an account?</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('LoginScreen')}>
-          <Text style={styles.loginLink}> Login here</Text>
-        </TouchableOpacity>
-      </View>
+    </View>
+  </View>
+
+      
     </ScrollView>
   );
 };  
@@ -466,8 +476,10 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 20,
+    paddingBottom: 40, // Add extra padding at the bottom
     backgroundColor: '#fff',
   },
+  
   header: {
     height: '0',
     backgroundColor: '#28a745',
@@ -517,6 +529,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
+    marginBottom: 'auto',
   },
   iconRight: {
     marginLeft: 10,
@@ -525,7 +538,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
-    marginBottom: 5,
+    marginBottom: 15,
   },
   pickerContainer: {
     flexDirection: 'row',
@@ -543,41 +556,51 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modal: {
-    backgroundColor: '#fff',
-    padding: 20,
-    margin: 20,
-    borderRadius: 10,
-  },
-  modalHeader: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  modalOption: {
-    paddingVertical: 15,
-  },
-  modalText: {
-    fontSize: 18,
-    color: '#333',
-  },
-  modalClose: {
-    fontSize: 16,
-    color: 'red',
-    marginTop: 20,
-    textAlign: 'center',
-  },
+  flex: 1,
+  justifyContent: 'center', // Centers the modal vertically
+  alignItems: 'center',     // Centers the modal horizontally
+  backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent overlay
+},
+modal: {
+  marginVertical: 'auto',
+  marginLeft: 'auto',
+  marginRight: 'auto',
+  width: '80%',        // Responsive modal width
+  padding: 20,
+  backgroundColor: '#fff',
+  borderRadius: 10,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.25,
+  shadowRadius: 3.84,
+  elevation: 5,        // Shadow for Android
+},
+modalHeader: {
+  fontSize: 20,
+  fontWeight: 'bold',
+  textAlign: 'center',
+  marginBottom: 10,
+},
+modalOption: {
+  paddingVertical: 10,
+  alignItems: 'left',
+},
+modalText: {
+  fontSize: 18,
+},
+modalClose: {
+  fontSize: 16,
+  color: 'red',
+  textAlign: 'center',
+  marginTop: 10,
+},
+
   signUpButton: {
     backgroundColor: '#28a745',
-    padding: 15,
+    padding: 10,
     borderRadius: 20,
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 10,
   },
   signUpButtonText: {
     color: '#fff',
@@ -587,7 +610,7 @@ const styles = StyleSheet.create({
   loginContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 15,
+    marginTop: 10,
   },
   loginText: {
     fontSize: 16,
@@ -598,6 +621,28 @@ const styles = StyleSheet.create({
     color: 'green',
     fontWeight: 'bold',
   },
+
+  map: {
+  width: '100%',   
+  height: '100%',     
+  borderRadius: 10, 
+},
+closeMapButton: {
+  position: 'absolute',
+  top: 40, 
+  right: 20, 
+  backgroundColor: 'rgba(255, 255, 255, 0.7)', 
+  borderRadius: 15,
+  padding: 5,
+  zIndex: 10, 
+},
+
+closeMapText: {
+  color: '#fff',
+  fontSize: 16,
+  fontWeight: 'bold',
+},
+
   imagePreviewContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -644,24 +689,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
 
-  inputGroup: {
-    flexDirection: 'row',
+  footerContainer: {
+    marginTop: 20,
+    marginBottom: 15, // Extra spacing at the bottom
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    marginBottom: 15,
   },
-  icon: { marginRight: 10 },
-  input: { flex: 1, fontSize: 16 },
-  modalContainer: { flex: 1 },
-  map: { flex: 1 },
-  saveButton: { padding: 15, backgroundColor: 'green', alignItems: 'center' },
-  saveButtonText: { color: '#fff', fontSize: 16 },
-  signUpButton: { marginTop: 20, backgroundColor: 'green', padding: 15, alignItems: 'center' },
-  signUpButtonText: { color: '#fff', fontSize: 16 },
+
+  
+  
+
+
   
 });
 

@@ -37,8 +37,7 @@ const GuidelinesScreen = ({ route }) => {
 
         {/* Location */}
         <View style={styles.locationRow}>
-          <Ionicons name="location-outline" size={16} color="#4CAF50" />
-          <Text style={styles.locationDetail}>{business.address || 'No address available'}</Text>
+          <Text style={styles.guidelinesTitle}>GUIDELINES</Text>
         </View>
 
         <View style={styles.divider} />
@@ -46,9 +45,6 @@ const GuidelinesScreen = ({ route }) => {
 
       {/* Guidelines Section */}
       <ScrollView contentContainerStyle={styles.contentContainer}>
-        <View style={styles.guidelinesTitleContainer}>
-          <Text style={styles.guidelinesTitle}>GUIDELINES</Text>
-        </View>
         <Text style={styles.guidelinesText}>
           {business.guidelines || 'No guidelines available for this business.'}
         </Text>

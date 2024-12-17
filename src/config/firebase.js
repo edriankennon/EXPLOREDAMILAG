@@ -12,7 +12,7 @@ const firebaseConfig = {
   authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN || "test-auth-da8cb.firebaseapp.com",
   databaseURL: process.env.REACT_APP_FIREBASE_DATABASE_URL || "https://test-auth-da8cb-default-rtdb.firebaseio.com",
   projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID || "test-auth-da8cb",
-  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET || "test-auth-da8cb.appspot.com",
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET || "test-auth-da8cb.firebasestorage.app",
   messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID || "70798891135",
   appId: process.env.REACT_APP_FIREBASE_APP_ID || "1:70798891135:web:2777735ef46b3134f6874a",
   measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID || "G-DXNRW5WD3L",

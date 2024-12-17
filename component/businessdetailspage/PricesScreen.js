@@ -3,11 +3,8 @@ import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'rea
 import { Ionicons } from '@expo/vector-icons';
 
 const PricesScreen = ({ route, navigation }) => {
-  const { business } = route.params || {}; // Access business data passed through navigation
-  const scrollViewRef = useRef(); // Reference to the ScrollView
-
-  // Ensure prices is an array or set it to an empty array
-  const prices = Array.isArray(business.prices) ? business.prices : [];
+  const { business } = route.params || {};
+  const scrollViewRef = useRef();
 
   if (!business) {
     return (
@@ -53,16 +50,18 @@ const PricesScreen = ({ route, navigation }) => {
         {/* Menu Section */}
         <View style={styles.menuSection}>
           <Text style={styles.menuTitle}>MENU</Text>
-          {prices.length > 0 ? (
-            prices.map((item, index) => (
+          {Array.isArray(business.prices) && business.prices.length > 0 ? (
+            business.prices.map((item, index) => (
               <TouchableOpacity key={index} style={styles.menuItem}>
                 <Image
-                  source={{ uri: business.businessImages?.[index % business.businessImages.length] || 'https://via.placeholder.com/80x80' }}
+                  source={{
+                    uri: business.businessImages?.[index % business.businessImages.length] || 'https://via.placeholder.com/80x80',
+                  }}
                   style={styles.itemImage}
                 />
                 <View style={styles.itemDetails}>
                   <Text style={styles.itemTitle}>{item.name}</Text>
-                  <Text style={styles.itemPrice}>${item.price.toFixed(2)}</Text>
+                  <Text style={styles.itemPrice}>${item.price?.toFixed(2)}</Text>
                 </View>
               </TouchableOpacity>
             ))
@@ -149,6 +148,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 10,
+    marginLeft: 16,
   },
   menuItem: {
     flexDirection: 'row',
