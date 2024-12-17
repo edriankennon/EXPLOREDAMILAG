@@ -33,19 +33,19 @@ const LocationScreen = ({ route }) => {
       {/* Content Section */}
       <ScrollView style={styles.content}>
         <Text style={styles.title}>Location</Text>
+        
+        <View style={styles.divider} />
+
         <View style={styles.locationContainer}>
           <Ionicons name="location-outline" size={24} color="#4CAF50" />
           <Text style={styles.infoText}>{business.location || 'No location available.'}</Text>
         </View>
-        <Text style={styles.description}>
-          {business.description || 'No additional information available about this location.'}
-        </Text>
       </ScrollView>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
     flex: 1,
     backgroundColor: '#f8f8f8',
@@ -75,40 +75,48 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: 20,
-    marginTop: 10,
+    marginTop: 30,
   },
   title: {
-    fontSize: 24,
+    fontSize: 40,
     fontWeight: 'bold',
     color: '#4CAF50',
     textAlign: 'center',
     marginBottom: 20,
   },
+
+  divider: {
+    width: '90%',
+    height: 1,
+    backgroundColor: '#4CAF50',
+    marginVertical: 15,
+    marginLeft: 15,
+  },
   locationContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 15,
+    marginTop: '45%',
+    marginBottom: '10%',
+    alignContent: 'center',
+    
   },
   infoText: {
-    fontSize: 16,
+    fontSize: 20,
     color: '#333',
     marginLeft: 10,
-    flex: 1,
-  },
+    alignContent: 'center',
+    
+ },
+
   description: {
+    marginTop: 70,
     fontSize: 16,
     color: '#555',
     textAlign: 'justify',
     lineHeight: 22,
     marginTop: 10,
   },
-  errorText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'red',
-    textAlign: 'center',
-    marginTop: 20,
-  },
-});
+
+};
 
 export default LocationScreen;

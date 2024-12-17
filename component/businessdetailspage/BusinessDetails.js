@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Dimensions
 import { Ionicons } from '@expo/vector-icons';
 import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore'; // Ensure setDoc is imported
 import app from '../../src/config/firebase';
+import { Alert } from 'react-native';
 
 // Get the screen dimensions
 const { width } = Dimensions.get('window');
@@ -10,10 +11,11 @@ const scaleSize = (size) => (width / 375) * size; // 375 is the width of iPhone 
 const scaleFont = (size) => (width / 375) * size;
 
 const BusinessDetails = ({ route, navigation }) => {
-  const [business, setBusiness] = useState(null);
+  const [business, setBusiness] = useState(route.params.business || null);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(false); // State to manage overview toggle
   const [isFavorited, setIsFavorited] = useState(false); // State for heart button
+
 
   const db = getFirestore(app);
 
@@ -54,10 +56,9 @@ const BusinessDetails = ({ route, navigation }) => {
   };
 
   const handleFavoriteToggle = async () => {
-    setIsFavorited(!isFavorited);
-  
     const userId = 'currentUserId'; // Replace with actual user ID
     const favoritesRef = doc(db, 'users', userId);
+    setIsFavorited(!isFavorited);
   
     try {
       const docSnap = await getDoc(favoritesRef);
@@ -75,6 +76,7 @@ const BusinessDetails = ({ route, navigation }) => {
         // Add to favorites
         const cleanedBusiness = cleanData(business); // Clean the business object
         updatedFavorites.push({ uid: business.uid, ...cleanedBusiness });
+        Alert.alert('Added to Favorites', `${business.businessName} has been added to your favorites.`);
       }
   
       // Clean the entire updatedFavorites array

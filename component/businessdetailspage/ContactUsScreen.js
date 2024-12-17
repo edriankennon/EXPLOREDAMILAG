@@ -26,13 +26,6 @@ const ContactUsScreen = ({ route }) => {
     );
   };
 
-  // Function to handle opening Facebook page
-  const openFacebookPage = () => {
-    const facebookUrl = business.facebook || 'https://facebook.com';
-    Linking.openURL(facebookUrl).catch((err) =>
-      console.error('Failed to open Facebook page:', err)
-    );
-  };
 
   if (!business) {
     return (
@@ -59,12 +52,10 @@ const ContactUsScreen = ({ route }) => {
 
       {/* Info Section */}
       <View style={styles.infoContainer}>
-        <Text style={styles.placeName}>{business.businessName || 'Business Name'}</Text>
+        <Text style={styles.placeName}>{'Contact Us'}</Text>
 
         {/* Location */}
         <View style={styles.locationRow}>
-          <Ionicons name="location-outline" size={16} color="#4CAF50" />
-          <Text style={styles.locationDetail}>{business.location || 'Location not available'}</Text>
         </View>
 
         <View style={styles.divider} />
@@ -73,32 +64,17 @@ const ContactUsScreen = ({ route }) => {
       {/* Contact Section */}
       <ScrollView contentContainerStyle={styles.contentContainer}>
         <View style={styles.titleContainer}>
-          <Text style={styles.title}>Contact Us</Text>
         </View>
 
         {/* Phone Number */}
         <View style={styles.contactItem}>
-          <FontAwesome name="phone" size={24} color="#4CAF50" style={styles.icon} />
-          <TouchableOpacity onPress={dialPhoneNumber}>
-            <Text style={[styles.contactText, styles.linkText]}>{business.contact || 'No phone number available'}</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Facebook */}
-        <View style={styles.contactItem}>
-          <FontAwesome name="facebook-square" size={24} color="#4267B2" style={styles.icon} />
-          <TouchableOpacity onPress={openFacebookPage}>
-            <Text style={[styles.contactText, styles.linkText]}>{business.facebook || 'No Facebook page available'}</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Email */}
-        <View style={styles.contactItem}>
-          <FontAwesome name="envelope" size={24} color="#EA4335" style={styles.icon} />
-          <TouchableOpacity onPress={sendEmail}>
-            <Text style={[styles.contactText, styles.linkText]}>{business.email || 'No email available'}</Text>
-          </TouchableOpacity>
-        </View>
+        <FontAwesome name="address-book" size={24} color="#4CAF50" style={styles.icon} />
+  <TouchableOpacity onPress={dialPhoneNumber}>
+    <Text style={[styles.contactText, styles.linkText]}>
+      {business.contactUs || 'No contact information available'}
+    </Text>
+  </TouchableOpacity>
+</View>
       </ScrollView>
     </View>
   );

@@ -8,7 +8,7 @@ const FavoritesScreen = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [favorites, setFavorites] = useState([]);
   const db = getFirestore(app);
-
+  
   // Fetch favorites from Firestore on component mount
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -90,7 +90,7 @@ const FavoritesScreen = ({ navigation }) => {
   const renderFavorite = ({ item }) => (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => navigation.navigate('BusinessDetails', { uid: item.uid })}
+      onPress={() => navigation.navigate('BusinessDetails', { business: item })}
     >
       <Image
         source={{ uri: item.businessImages?.[0] || 'https://via.placeholder.com/100x100' }}

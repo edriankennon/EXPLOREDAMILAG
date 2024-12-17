@@ -296,6 +296,7 @@ const SignUpScreen = () => {
         <TextInput
           style={styles.input}
           placeholder="Overview"
+          multiline={true}
           value={overview}
           onChangeText={setOverview}
         />
@@ -396,6 +397,7 @@ const SignUpScreen = () => {
             <TextInput
               style={styles.input}
               placeholder="Guidelines"
+              multiline={true}
               value={guidelines}
               onChangeText={setGuidelines}
             />
@@ -407,7 +409,8 @@ const SignUpScreen = () => {
             <FontAwesome name="money" size={20} color="green" style={styles.icon} />
             <TextInput
               style={styles.input}
-              placeholder="Prices"
+              placeholder={`e.g., Lechon Kawali - P500.00\nDinuguan - P80.00\nAdobo - P80.00`}
+              multiline={true}
               value={prices}
               onChangeText={setPrices}
             />
@@ -418,11 +421,12 @@ const SignUpScreen = () => {
           <View style={styles.inputGroup}>
             <FontAwesome name="phone" size={20} color="green" style={styles.icon} />
             <TextInput
-              style={styles.input}
-              placeholder="Contact Us"
-              value={contactUs}
-              onChangeText={setContactUs}
-            />
+  style={styles.input}
+  placeholder={`e.g., Phone number: *****\nFacebook Page: fb.com/yourpage\nEmail Address: yourname@gmail.com`}
+  multiline={true} // Allow multiple lines for placeholders
+  value={contactUs}
+  onChangeText={setContactUs}
+/>
           </View>
         </>
       )}

@@ -1,36 +1,51 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getAuth } from 'firebase/auth';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import app from '../src/config/firebase';
 
 const SideMenu = ({ toggleMenu }) => {
   const navigation = useNavigation();
   const [profilePicture, setProfilePicture] = useState('https://via.placeholder.com/100'); // Default placeholder
+  const [loading, setLoading] = useState(false); // Add loading state for refresh
 
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      onAuthStateChanged(auth, async (user) => {
-        if (user) {
-          const userDoc = doc(db, 'users', user.uid); // Fetch user document
-          const docSnap = await getDoc(userDoc);
-          if (docSnap.exists()) {
-            const userData = docSnap.data();
-            setProfilePicture(userData.profilePicture || 'https://via.placeholder.com/100'); // Set profile picture from Firestore
-          } else {
-            console.log('No user data found in Firestore!');
-          }
+  // Fetch user data manually
+  const fetchUserProfile = useCallback(async () => {
+    setLoading(true);
+    try {
+      const user = auth.currentUser; // Directly get the logged-in user
+      if (user) {
+        const userDoc = doc(db, 'users', user.uid); // Reference to Firestore document
+        const docSnap = await getDoc(userDoc); // Fetch data
+        if (docSnap.exists()) {
+          const userData = docSnap.data();
+          setProfilePicture(userData.profilePicture || 'https://via.placeholder.com/100');
+        } else {
+          console.log('No user data found in Firestore!');
         }
-      });
-    };
+      } else {
+        console.log('No user is currently logged in!');
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+    setLoading(false);
+  }, [auth, db]);
 
+  // Fetch profile data on component mount
+  useEffect(() => {
     fetchUserProfile();
-  }, []);
+  }, [fetchUserProfile]);
+
+  // Full Refresh Button
+  const handleFullRefresh = () => {
+    fetchUserProfile(); // Manually fetch data
+  };
 
   return (
     <View style={StyleSheet.absoluteFill}>
@@ -38,17 +53,21 @@ const SideMenu = ({ toggleMenu }) => {
       <TouchableOpacity
         style={styles.overlay}
         onPress={toggleMenu}
-        activeOpacity={1} // Ensures touch is registered without fading effect
+        activeOpacity={1}
       />
 
       {/* Side Menu */}
       <View style={styles.sideMenu}>
         {/* Profile Section */}
         <View style={styles.profileContainer}>
-          <Image
-            source={{ uri: profilePicture }}
-            style={styles.profileImage}
-          />
+          {loading ? (
+            <ActivityIndicator size="large" color="#ffffff" />
+          ) : (
+            <Image source={{ uri: profilePicture }} style={styles.profileImage} />
+          )}
+          <TouchableOpacity style={styles.refreshButton} onPress={handleFullRefresh}>
+            <Text style={styles.refreshText}>⟳ Refresh All</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Menu Items */}
@@ -87,8 +106,8 @@ const SideMenu = ({ toggleMenu }) => {
 
 const styles = StyleSheet.create({
   overlay: {
-    ...StyleSheet.absoluteFillObject, // Covers the entire screen
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Optional: gives a dimmed background effect
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   sideMenu: {
     height: '100%',
@@ -99,20 +118,29 @@ const styles = StyleSheet.create({
     backgroundColor: 'green',
     padding: 20,
     flexDirection: 'column',
-    zIndex: 102, // Ensure it appears above other content
+    zIndex: 102,
   },
   profileContainer: {
-    alignItems: 'left',
-    marginBottom: 10, 
+    alignItems: 'center',
+    marginBottom: 10,
     marginTop: 40,
   },
   profileImage: {
     width: 60,
     height: 60,
-    borderRadius: 30, 
+    borderRadius: 30,
     borderWidth: 1,
-    borderColor: 'green', 
-    
+    borderColor: 'green',
+  },
+  refreshButton: {
+    marginTop: 10,
+    padding: 5,
+    backgroundColor: '#2d2d2d',
+    borderRadius: 5,
+  },
+  refreshText: {
+    color: 'white',
+    fontSize: 14,
   },
   menuItems: {
     marginTop: 20,

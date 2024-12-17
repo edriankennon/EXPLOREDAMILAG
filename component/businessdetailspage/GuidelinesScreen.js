@@ -32,13 +32,7 @@ const GuidelinesScreen = ({ route }) => {
 
       {/* Info Section */}
       <View style={styles.infoContainer}>
-        <Text style={styles.placeName}>{business.businessName || 'Business Name'}</Text>
-        <Text style={styles.subtitle}>{business.location || 'Location not available'}</Text>
-
-        {/* Location */}
-        <View style={styles.locationRow}>
-          <Text style={styles.guidelinesTitle}>GUIDELINES</Text>
-        </View>
+        <Text style={styles.placeName}>{'Guidelines'}</Text>
 
         <View style={styles.divider} />
       </View>
@@ -89,23 +83,11 @@ const styles = StyleSheet.create({
     width: '100%',
     textAlign: 'center',
   },
-  subtitle: {
-    fontSize: 14,
-    color: '#7A7A7A',
-    marginBottom: 8,
-    width: '100%',
-    textAlign: 'center',
-  },
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 10,
-  },
-  locationDetail: {
-    fontSize: 14,
-    color: 'black',
-    marginLeft: 5,
   },
   divider: {
     width: '90%',
@@ -121,24 +103,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 15,
   },
-  guidelinesTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-  },
   guidelinesText: {
     fontSize: 16,
     color: '#333',
     textAlign: 'justify',
     lineHeight: 22,
   },
-  errorText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'red',
-    textAlign: 'center',
-    marginTop: 20,
-  },
+  
 });
 
 export default GuidelinesScreen;
