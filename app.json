@@ -1,5 +1,6 @@
 {
-  "name": "stickersmash",
+  "name": "Explore Damilag",
+  "icon": "./assets/icon.png",
   "version": "1.0.0",
   "main": "expo/AppEntry.js",
   "scripts": {
@@ -7,6 +8,11 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web"
+  },
+  "splash": {
+    "image": "./assets/splash.png",
+    "resizeMode": "contain",
+    "backgroundColor": "#ffffff"
   },
   "dependencies": {
     "@expo/metro-runtime": "~4.0.0",
@@ -48,5 +54,20 @@
     "@babel/core": "^7.24.0",
     "glob": "^9.3.5"
   },
-  "private": true
+  "private": true,
+  "extra": {
+    "eas": {
+      "projectId": "08f186a3-91ac-4174-94ab-63bc54887c2a"
+    }
+  },
+  "expo": {
+    "android": {
+      "package": "com.clydecellan.exploredamilag"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "9518aa0e-7761-48f8-9785-8b573240d104"
+      }
+    }
+  }
 }

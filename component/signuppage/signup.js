@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Modal, ScrollView } from 'react-native';
+import { Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Modal, ScrollView, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard} from 'react-native';
 import { FontAwesome, Entypo } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
@@ -187,24 +188,32 @@ const SignUpScreen = () => {
   };
 
   return (
-    <ScrollView  bounces={true}
-    keyboardShouldPersistTaps="handled"
-    contentContainerStyle={styles.container}>
-      <View style={styles.header} />
-      <Text style={styles.headerText}>Sign Up</Text>
-  
-      {/* Profile Photo */}
-      <View style={styles.photoContainer}>
-        <TouchableOpacity onPress={pickImage}>
-          <Image
-            source={{
-              uri: profilePhotoUri || 'https://via.placeholder.com/100',
-            }}
-            style={styles.image}
-          />
-        </TouchableOpacity>
-      </View>
-  
+    <KeyboardAvoidingView 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+      style={{ flex: 1 }}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <ScrollView
+          bounces={true}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={styles.container}
+        >
+          {/* Your existing code starts here */}
+          <View style={styles.header} />
+          <Text style={styles.headerText}>Sign Up</Text>
+          
+          {/* Profile Photo */}
+          <View style={styles.photoContainer}>
+            <TouchableOpacity onPress={pickImage}>
+              <Image
+                source={{
+                  uri: profilePhotoUri || 'https://via.placeholder.com/100',
+                }}
+                style={styles.image}
+              />
+            </TouchableOpacity>
+          </View>
+
       {/* Username */}
       <View style={styles.inputGroup}>
         <FontAwesome name="user" size={20} color="green" style={styles.icon} />
@@ -459,22 +468,22 @@ const SignUpScreen = () => {
 )}
   
 <View style={styles.footerContainer}>
-    <TouchableOpacity style={styles.signUpButton} onPress={handleSignUpSubmit}>
-      <Text style={styles.signUpButtonText}>Sign Up</Text>
-    </TouchableOpacity>
-    
-    <View style={styles.loginContainer}>
-      <Text style={styles.loginText}>Already have an account?</Text>
-      <TouchableOpacity onPress={() => navigation.navigate('LoginScreen')}>
-        <Text style={styles.loginLink}> Login here</Text>
-      </TouchableOpacity>
-    </View>
-  </View>
+            <TouchableOpacity style={styles.signUpButton} onPress={handleSignUpSubmit}>
+              <Text style={styles.signUpButtonText}>Sign Up</Text>
+            </TouchableOpacity>
 
-      
-    </ScrollView>
+            <View style={styles.loginContainer}>
+              <Text style={styles.loginText}>Already have an account?</Text>
+              <TouchableOpacity onPress={() => navigation.navigate('LoginScreen')}>
+                <Text style={styles.loginLink}> Login here</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
-};  
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -601,15 +610,16 @@ modalClose: {
 
   signUpButton: {
     backgroundColor: '#28a745',
-    padding: 10,
+    padding: 20,
     borderRadius: 20,
     alignItems: 'center',
-    marginTop: 10,
+    
   },
   signUpButtonText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+  
   },
   loginContainer: {
     flexDirection: 'row',
@@ -661,10 +671,10 @@ closeMapText: {
   },
   imagePickerButton: {
     backgroundColor: '#ddd',
-    paddingVertical: 10,
-    borderRadius: 10,
+    paddingVertical: 15,
+    borderRadius: 12,
     alignItems: 'center',
-    marginVertical: 15,
+    marginVertical: 20,
   },
   imagePickerButtonText: {
     fontSize: 16,

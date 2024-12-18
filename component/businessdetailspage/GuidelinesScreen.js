@@ -61,15 +61,14 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     position: 'relative',
-    width: '50%',
-    marginTop: 80, // Adjust to make room for the back button
+    width: '100%',
   },
   mainImage: {
-    width: '100%',
+   width: '100%',
     height: 280,
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
-    resizeMode: 'contain',
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    resizeMode: 'cover',
   },
   infoContainer: {
     marginTop: 20,
