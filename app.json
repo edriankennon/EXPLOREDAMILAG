@@ -55,19 +55,15 @@
     "glob": "^9.3.5"
   },
   "private": true,
-  "extra": {
-    "eas": {
-      "projectId": "08f186a3-91ac-4174-94ab-63bc54887c2a"
-    }
-  },
   "expo": {
     "android": {
       "package": "com.clydecellan.exploredamilag"
     },
     "extra": {
       "eas": {
-        "projectId": "9518aa0e-7761-48f8-9785-8b573240d104"
+        "projectId": "65047827-78d0-4447-8a26-fe2c1b3b9ac7"
       }
-    }
+    },
+    "owner": "clydecellan"
   }
 }
